@@ -1,0 +1,97 @@
+:root {
+    --destructive: oklch(62% .21 25);
+}
+
+.container {
+    display: flex;
+    height: 100vh;
+
+    align-items: center;
+    justify-content: space-around;
+}
+
+.auth-panel input {
+    display: block;
+}
+
+.auth-panel.login-mode .signup-form {
+    display: none;
+}
+
+.auth-panel.signup-mode .login-form {
+    display: none;
+}
+
+.login-form .signup-link {
+    cursor: pointer;
+}
+
+.login-form .signup-link:hover {
+    text-decoration: underline;
+}
+
+.signup-form .login-link {
+    cursor: pointer;
+}
+
+.signup-form .login-link:hover {
+    text-decoration: underline;
+}
+
+.login-email-empty,
+.login-email-invalid,
+.login-password-empty,
+.login-password-incorrect {
+    display: none;
+    color: var(--destructive);
+}
+
+.login-email-empty.show {
+    display: block;
+}
+
+.login-email-invalid.show {
+    display: block;
+}
+
+.login-password-empty.show {
+    display: block;
+}
+
+.login-password-incorrect.show {
+    display: block;
+}
+
+.signup-name-empty,
+.signup-email-empty,
+.signup-password-empty,
+.signup-confirm-password-empty,
+.signup-confirm-password-mismatch,
+.signup-duplicate-account {
+    display: none;
+    color: var(--destructive);
+}
+
+.signup-name-empty.show {
+    display: block;
+}
+
+.signup-email-empty.show {
+    display: block;
+}
+
+.signup-password-empty.show {
+    display: block;
+}
+
+.signup-confirm-password-empty.show {
+    display: block;
+}
+
+.signup-confirm-password-mismatch.show {
+    display: block;
+}
+
+.signup-duplicate-account.show {
+    display: block;
+}
