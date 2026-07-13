@@ -18,6 +18,9 @@ if ($action == "login") {
     addCredential();
 } else if ($action == "getCredential") {
     getCredential();
+} else if ($action == "deleteCredential") {
+    deleteCredential();
+
 }
 
 // validate login
@@ -127,6 +130,23 @@ function getCredential() {
             "password" => $credential['password'],
             "url" => $credential['url'],
             "notes" => $credential['notes']
+        ]);
+    }
+}
+
+function deleteCredential() {
+    global $conn;
+
+    $id = $_POST['id'];
+    $userId = $_SESSION['userId'];
+
+    $deleteCredential = "DELETE FROM credentials WHERE id = '$id' AND user_id = '$userId'";
+
+    $result = mysqli_query($conn, $deleteCredential);
+
+    if ($result) {
+        echo json_encode([
+            "success" => true
         ]);
     }
 }

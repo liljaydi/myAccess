@@ -166,6 +166,7 @@ saveButton.addEventListener('submit', (e) => {
                 if (actionMenuOpened) {
                     actionMenu.classList.remove('show');
                 } else {
+                    console.log("\naccount id clicked: " + row.dataset.id);
                     actionMenu.classList.add('show');
                 }
             })
@@ -174,7 +175,6 @@ saveButton.addEventListener('submit', (e) => {
                 showDeleteModal();
                 closeActionMenu();
 
-                console.log(row.dataset.id);
                 accountDetailsContainer.innerHTML = "";
                 deleteCredential(row);
             });
@@ -219,8 +219,10 @@ function clearInputData() {
 
 // handles empty state display
 const emptyState = document.querySelector('.empty-state');
+
 function hideEmptyState() {
     emptyState.classList.add('hide');
+    accountList.classList.remove('hide');
 }
 
 /*======================================
@@ -228,6 +230,7 @@ function hideEmptyState() {
     show and hide sidebar navigation
 
 ======================================*/
+
 const sidebar = document.querySelector('nav');
 
 const toggleLeft = document.querySelector('.toggle-left');
@@ -533,6 +536,7 @@ actionMenu.forEach((menu) => {
 document.querySelectorAll('.action-menu-btn').forEach((menuBtn) => {
     menuBtn.addEventListener('click', (e) => {
         e.stopPropagation();
+        const row = menuBtn.parentElement;
 
         let actionMenuOpened = menuBtn.nextElementSibling.classList.contains('show');
         closeActionMenu();
@@ -540,6 +544,8 @@ document.querySelectorAll('.action-menu-btn').forEach((menuBtn) => {
         if (actionMenuOpened) {
             menuBtn.nextElementSibling.classList.remove('show');
         } else {
+            console.log("\naccount id clicked: " + row.dataset.id);
+            //menuBtn.classList.add('show');
             menuBtn.nextElementSibling.classList.add('show');
         }
     });
@@ -561,7 +567,6 @@ deleteBtn.forEach((btn) => {
         closeActionMenu();
 
         const row = btn.parentElement.parentElement;
-        console.log(row.dataset.id);
         accountDetailsContainer.innerHTML = "";
         deleteCredential(row);
     });
@@ -587,6 +592,9 @@ function deleteCredential(row) {
 
         displayAccountInfo(data);
         deleteModal.classList.add('visible');
+        console.log("\naccount to delete");
+        console.log("title: " + data.title);
+        console.log("id   : " + deleteId);
     });
 }
 
@@ -613,5 +621,36 @@ const continueDelete = document.querySelector('.confirm-delete .delete');
 
 cancelDelete.addEventListener('click', closeAddPanel);
 continueDelete.addEventListener('click', () => {
+    const formdata = new FormData();
 
+    formdata.append("action", "deleteCredential");
+    formdata.append("id", deleteId);
+
+    fetch("action.php", {
+        method: "POST",
+        body: formdata
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            console.log("delete successful");
+
+            const row = document.querySelector(`.account-row[data-id="${deleteId}"]`);
+            if (row) row.remove();
+
+            if (previousId === deleteId) {
+                closeCredential();
+                previousId = null;
+            }
+
+            closeAddPanel();
+
+            if (document.querySelectorAll('.account-row').length === 0) {
+                emptyState.classList.remove('hide');
+                accountList.classList.add('hide');
+            }
+        } else {
+            console.log("delete failed");
+        }
+    })
 });

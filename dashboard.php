@@ -91,7 +91,7 @@ $result = mysqli_query($conn, $getCredentials);
                 </div>
 
                 <!-- displays account added -->
-                <div class="account-list">
+                <div class="account-list <?= mysqli_num_rows($result) > 0 ? '' : 'hide' ?>">
 
                     <?php
                     while ($credential = mysqli_fetch_assoc($result)) {

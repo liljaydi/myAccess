@@ -163,8 +163,9 @@ nav .active {
     font-weight: 500;
     height: 36px;
 
-    transition: background-color 0.2s ease;
-    transition: color 0.2s ease;
+    transition: 
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
 
 .sidebar-link:hover {
@@ -534,7 +535,12 @@ nav .active {
 
 /* account added displayed in list */
 
+.account-list.hide {
+    display: none;
+}
+
 .account-list {
+    display: block;
     overflow-y: auto;
     min-height: calc(100vh - 108px);
     padding: 1px var(--space-l) 0px;
