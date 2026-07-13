@@ -25,6 +25,10 @@ function closeAddPanel() {
     addPanel.classList.remove('show');
     unfocus.classList.remove('show');
     clearBlankInputState();
+
+    deleteModal.classList.remove('show');
+    deleteModal.classList.remove('visible');
+    deleteId = null;
 }
 
 /*============================
@@ -126,9 +130,6 @@ saveButton.addEventListener('submit', (e) => {
                     <div class="delete-btn">
                         <img src='assets/trash-light-red.svg' alt='Error'>
                         <p>Delete</p>
-                        <div>
-                            
-                        </div>
                     </div>
                 </div>
             `
@@ -147,21 +148,36 @@ saveButton.addEventListener('submit', (e) => {
                 openCredential(row.dataset.id, row);
             });
 
-            const btn = row.querySelector('.action-menu-btn');
+            const menuBtn = row.querySelector('.action-menu-btn');
+            const actionMenu = row.querySelector('.action-menu');
 
-            btn.addEventListener('click', (e) => {
+            // stops clicking the row when action menu is click
+            actionMenu.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+
+            // functions the action menu button
+            menuBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
 
-                let actionMenuOpened = row.nextElementSibling.classList.contains('show');
+                let actionMenuOpened = actionMenu.classList.contains('show');
                 closeActionMenu();
 
                 if (actionMenuOpened) {
-                    row.nextElementSibling.classList.remove('show');
+                    actionMenu.classList.remove('show');
                 } else {
-                    row.nextElementSibling.classList.add('show');
+                    actionMenu.classList.add('show');
                 }
             })
 
+            row.querySelector('.delete-btn').addEventListener('click', () => {
+                showDeleteModal();
+                closeActionMenu();
+
+                console.log(row.dataset.id);
+                accountDetailsContainer.innerHTML = "";
+                deleteCredential(row);
+            });
 
             clearInputData();
             closeAddPanel();
@@ -172,42 +188,12 @@ saveButton.addEventListener('submit', (e) => {
     });
 });
 
-document.addEventListener('click', closeActionMenu);
+/*============================================
 
-function closeActionMenu() {
-    const actionMenuShowed = document.querySelectorAll('.action-menu.show');
-    actionMenuShowed.forEach((menu) => {
-        menu.classList.remove('show');
-    });
-}
+ cancels add account and clears all inputs
 
-const actionMenu = document.querySelectorAll('.action-menu');
+============================================*/
 
-actionMenu.forEach((menu) => {
-    menu.addEventListener('click', (e) => {
-        e.stopPropagation();
-    });
-});
-
-
-
-document.querySelectorAll('.action-menu-btn').forEach((row) => {
-    row.addEventListener('click', (e) => {
-        e.stopPropagation();
-
-        let actionMenuOpened = row.nextElementSibling.classList.contains('show');
-        closeActionMenu();
-
-        if (actionMenuOpened) {
-            row.nextElementSibling.classList.remove('show');
-        } else {
-            row.nextElementSibling.classList.add('show');
-        }
-    });
-});
-
-
-// cancels add account and clears all inputs
 cancelButton.addEventListener('click', () => {
     clearInputData();
     closeAddPanel();
@@ -323,7 +309,6 @@ const accountRow = document.querySelectorAll('.account-row');
 const credentialsContainer = document.querySelector('#credentials-container');
 
 let credentialOpen = false;
-
 let previousId = null;
 
 accountRow.forEach((row) => {
@@ -340,6 +325,12 @@ accountRow.forEach((row) => {
         openCredential(row.dataset.id, row);
     })
 })
+
+/*==========================================
+
+    close credential (pressing x button)
+
+==========================================*/
 
 const closeCredentialBtn = document.querySelector('.close-credential-btn');
 
@@ -360,25 +351,25 @@ function resetClick() {
     });
 }
 
+/*==============================
+
+    open credentials details
+
+==============================*/
+
 function openCredential(id, row) {
     const formdata = new FormData();
 
-    formdata.append("action", "getCredential");
+    formdata.append("action", "getCredential"); 
     formdata.append("id", id);
 
-    fetch("action.php", {
-        method: "POST",
-        body: formdata
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) {
-            renderCredential(data);
-        } else {
+    getCredential(formdata).then(data => {
+        if (!data) {
             console.log("failed");
             return;
         }
-    })
+        renderCredential(data);
+    });
 
     credentialsContainer.classList.add('flex');
     accountList.classList.add('open');
@@ -388,6 +379,21 @@ function openCredential(id, row) {
     row.classList.add('highlight');
     const btn = row.querySelector('.action-menu-btn');
     btn.classList.add('show');
+}
+
+function getCredential(formdata) {
+    return fetch("action.php", {
+        method: "POST",
+        body: formdata
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            return data;
+        } else {
+            return false;
+        }
+    })
 }
 
 function renderCredential(data) {
@@ -497,7 +503,115 @@ function closeCredential() {
 
 const closeAddPanelBtn = document.querySelector('.close-add-panel-btn');
 
-closeAddPanelBtn.addEventListener('click', () => {
-    closeAddPanel();
+closeAddPanelBtn.addEventListener('click', closeAddPanel);
+
+/*===============================
+
+    action menu functionality
+
+===============================*/
+
+document.addEventListener('click', closeActionMenu);
+
+function closeActionMenu() {
+    const actionMenuShowed = document.querySelectorAll('.action-menu.show');
+    actionMenuShowed.forEach((menu) => {
+        menu.classList.remove('show');
+    });
+}
+
+// stops clicking the row when action menu is clicked
+const actionMenu = document.querySelectorAll('.action-menu');
+
+actionMenu.forEach((menu) => {
+    menu.addEventListener('click', (e) => {
+        e.stopPropagation();
+    });
 });
 
+// action menu click
+document.querySelectorAll('.action-menu-btn').forEach((menuBtn) => {
+    menuBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+
+        let actionMenuOpened = menuBtn.nextElementSibling.classList.contains('show');
+        closeActionMenu();
+
+        if (actionMenuOpened) {
+            menuBtn.nextElementSibling.classList.remove('show');
+        } else {
+            menuBtn.nextElementSibling.classList.add('show');
+        }
+    });
+});
+
+/*====================
+
+    delete account
+
+====================*/
+
+const deleteBtn = document.querySelectorAll('.delete-btn');
+const deleteModal = document.querySelector('.delete-modal');
+const accountDetailsContainer = document.querySelector(".account-details-container");
+
+deleteBtn.forEach((btn) => {
+    btn.addEventListener('click', () => {
+        showDeleteModal();
+        closeActionMenu();
+
+        const row = btn.parentElement.parentElement;
+        console.log(row.dataset.id);
+        accountDetailsContainer.innerHTML = "";
+        deleteCredential(row);
+    });
+});
+
+function showDeleteModal() {
+    unfocus.classList.add('show');
+    deleteModal.classList.add('show');
+}
+
+function deleteCredential(row) {
+    const formdata = new FormData();
+    deleteId = row.dataset.id;
+
+    formdata.append("action", "getCredential"); 
+    formdata.append("id", row.dataset.id);
+
+    getCredential(formdata).then(data => {
+        if (!data) {
+            console.log("failed");
+            return;
+        }
+
+        displayAccountInfo(data);
+        deleteModal.classList.add('visible');
+    });
+}
+
+let deleteId = null;
+
+function displayAccountInfo(data) {
+    accountDetailsContainer.innerHTML = `
+        <p class="sub-heading">This will permanently remove <span>${data.title}</span> from your saved accounts.</p>
+
+        <div class="account-details">
+            <div class="main-info">
+                <p class="account-img">${data.initial.toUpperCase()}</p>
+                <div>
+                    <p class="row-title">${data.title}</p>
+                    <p class="row-username">${data.username}</p>
+                </div>
+            </div>
+        </div>
+    `
+}
+
+const cancelDelete = document.querySelector('.confirm-delete .cancel');
+const continueDelete = document.querySelector('.confirm-delete .delete');
+
+cancelDelete.addEventListener('click', closeAddPanel);
+continueDelete.addEventListener('click', () => {
+
+});

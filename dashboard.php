@@ -52,10 +52,12 @@ $result = mysqli_query($conn, $getCredentials);
                 </a>
 
                 <!-- folder button -->
+                <!--
                 <a class="sidebar-link">
                     <img class="folder-icon" src="assets/folder.svg" alt="Error">
                     <span>Folder</span>
                 </a>
+                -->
 
                 <!-- favorites button -->
                 <a class="sidebar-link">
@@ -98,10 +100,12 @@ $result = mysqli_query($conn, $getCredentials);
                         echo "
                             <div class='account-row' data-id='{$credential['id']}'>
                                 <div class='account-img'>$initial</div>
+
                                 <div>
                                     <p class='row-title'>{$credential['title']}</p>
                                     <p class='row-username'>{$credential['username']}</p>
                                 </div>
+
                                 <img class='action-menu-btn' src='assets/dots-vertical-rounded.svg' alt='Error'>
                                 <div class='action-menu'>
                                     <div class='edit-btn'>
@@ -124,6 +128,19 @@ $result = mysqli_query($conn, $getCredentials);
                     <img class="close-credential-btn" src="assets/x-muted.svg" alt="Error">
 
                     <div class="credential-content"></div>
+                </div>
+
+                <div class="delete-modal">
+                    <div class="alert-icon-container">
+                        <img class="alert-icon" src="assets/alert-triangle.svg" alt="Error">
+                    </div>
+
+                    <h2>Delete account?</h2>
+                    <div class="account-details-container"></div>
+                    <div class="confirm-delete">
+                        <button class="cancel">cancel</button>
+                        <button class="delete">Delete</button>
+                    </div>
                 </div>
 
             </div>

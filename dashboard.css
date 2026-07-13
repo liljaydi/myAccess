@@ -314,6 +314,7 @@ nav .active {
     border-radius: 18px;
     width: 560px;
     overflow-y: auto;
+    z-index: 10000;
 
     transform: translateX(100%);
     transition: transform 0.25s ease;
@@ -491,6 +492,7 @@ nav .active {
     width: 100%;
     height: 100%;
     background-color: oklch(from var(--sidebar) calc(l + 0.1) c h);
+    z-index: 2000;
 
     opacity: 0;
     transition: opacity 0.25s ease;
@@ -813,4 +815,135 @@ nav .active {
 
 .delete-btn p {
     color: oklch(from var(--destructive) calc(l + 0.1) c h);
+}
+
+.delete-modal {
+    display: none;
+    visibility: hidden;
+    position: fixed;
+    top: 50%;
+    right: 50%;
+    background-color: var(--background);
+    border-radius: 14px;
+    padding: 20px;
+    padding: 20px;
+    z-index: 10100;
+    max-width: 380px;
+
+    transform: translate(50%, -50%);
+}
+
+.delete-modal.show {
+    display: block;
+}
+
+.delete-modal.visible {
+    visibility: visible;
+}
+
+.delete-modal h2 {
+    display: flex;
+    justify-content: center;
+    font-size: var(--text-base);
+    margin-bottom: var(--space-xs);
+}
+
+.alert-icon-container {
+    width: fit-content;
+    margin: 0 auto;
+    border-radius: 50%;
+
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 8px;
+    padding-bottom: 12px;
+    background-color: oklch(62.058% 0.21021 25.018 / 0.128);
+
+    margin-bottom: var(--space-xs);
+}
+
+.alert-icon {
+    display: flex;
+    margin-left: auto;
+    margin-right: auto;
+    width: 24px;
+}
+
+.account-details-container {
+    font-size: var(--text-sm);
+    min-height: 104px;
+}
+
+.account-details-container .sub-heading {
+    color: var(--muted-foreground);
+    text-align: center;
+    font-weight: 400;
+    margin-bottom: var(--space-s);
+}
+
+.account-details-container span {
+    font-weight: 500;
+    color: var(--foreground);
+}
+
+.account-details {
+    padding: 12px;
+    background-color: var(--card);
+    border-radius: 14px;
+    margin-bottom: 18px;
+}
+
+.main-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.delete-modal .row-title {
+    font-size: var(--text-sm);
+    white-space: nowrap;
+    font-weight: 500;
+}
+
+.delete-modal .row-username {
+    font-size: var(--text-sm);
+    white-space: nowrap;
+    font-weight: 400;
+    color: var(--muted-foreground);
+}
+
+.confirm-delete {
+    display: flex;
+    gap: 12px;
+}
+
+.confirm-delete button {
+    flex: 1;
+    border: none;
+    padding: 10px;
+    border-radius: 16px;
+    font-weight: 500;
+    font-size: var(--text-base);
+    cursor: pointer;
+}
+
+.confirm-delete .cancel {
+    outline: 1px solid #2a2a2f;
+    background-color: var(--background);
+    color: var(--muted-foreground);
+
+    transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.confirm-delete .cancel:hover {
+    outline: none;
+    color: var(--foreground);
+    background-color: oklch(26.962% 0.02539 268.311 / 0.676);
+}
+
+.confirm-delete .delete {
+    background-color: var(--destructive);
+    color: var(--foreground);
 }
