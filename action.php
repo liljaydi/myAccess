@@ -20,7 +20,6 @@ if ($action == "login") {
     getCredential();
 } else if ($action == "deleteCredential") {
     deleteCredential();
-
 }
 
 // validate login
@@ -79,11 +78,6 @@ function signup() {
 
 function addCredential() {
     global $conn;
-
-    if (!isset($_SESSION['userId'])) {
-        echo "not logged in";
-        return;
-    }
     
     $userId = $_SESSION['userId'];
     $title = $_POST['title'];
@@ -107,8 +101,12 @@ function addCredential() {
             "id" => $newId,
             "initial" => $initial
         ]);
-    } 
-}
+    } else {
+        echo json_encode([
+            "success" => false
+        ]);
+    }
+} 
 
 // return full credential
 function getCredential() {
@@ -131,6 +129,10 @@ function getCredential() {
             "url" => $credential['url'],
             "notes" => $credential['notes']
         ]);
+    } else {
+        echo json_encode([
+            "success" => false
+        ]);
     }
 }
 
@@ -147,6 +149,10 @@ function deleteCredential() {
     if ($result) {
         echo json_encode([
             "success" => true
+        ]);
+    } else {
+        echo json_encode([
+            "success" => false
         ]);
     }
 }

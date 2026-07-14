@@ -5,6 +5,7 @@
 =======================*/
 
 const addButton = document.querySelectorAll('.add-button');
+const closeAddPanelBtn = document.querySelector('.close-add-panel-btn');
 const addPanel = document.getElementById('add-panel');
 const unfocus = document.querySelector('.unfocus');
 
@@ -13,8 +14,9 @@ addButton.forEach((button) => {
     button.addEventListener('click', showAddPanel);
 })
 
-// close add panel by clicking outside
+// close add panel
 unfocus.addEventListener('click', closeAddPanel);
+closeAddPanelBtn.addEventListener('click', closeAddPanel);
 
 function showAddPanel() {
     addPanel.classList.add('show');
@@ -25,10 +27,6 @@ function closeAddPanel() {
     addPanel.classList.remove('show');
     unfocus.classList.remove('show');
     clearBlankInputState();
-
-    deleteModal.classList.remove('show');
-    deleteModal.classList.remove('visible');
-    deleteId = null;
 }
 
 /*============================
@@ -43,11 +41,8 @@ const passwordInput = document.querySelector('.password');
 const urlInput = document.querySelector('.url');
 const notesInput = document.querySelector('.notes');
 
-// confirm add account
 const saveButton = document.querySelector('.add-form');
 const cancelButton = document.querySelector('.confirm-add .cancel');
-
-// blank required input
 const titleErrorMsg = document.querySelector('.title-error-msg');
 
 // removes red outline when user types inside input
@@ -66,7 +61,6 @@ saveButton.addEventListener('submit', (e) => {
     clearBlankInputState();
 
     const titleEmpty = !titleInput.value;
-
     if (titleEmpty) {
         titleInput.classList.add('red-outline');
         titleErrorMsg.classList.add('show');
@@ -81,90 +75,101 @@ saveButton.addEventListener('submit', (e) => {
     formdata.append("url", urlInput.value);
     formdata.append("notes", notesInput.value);
 
-    fetch("action.php", {
-        method: "POST",
-        body: formdata
-    })
-    .then (res => res.json())
-    .then (data => {
-        if (data.success) {
-
-            const row = document.createElement('div');
-            
-            row.dataset.id = data.id;
-            row.classList.add('account-row');
-            row.innerHTML = `
-                <p class="account-img">${data.initial.toUpperCase()}</p>
-                <div>
-                    <p class='row-title'>${titleInput.value}</p>
-                    <p class='row-username'>${usernameInput.value}</p>
-                </div>
-                <img class="action-menu-btn" src="assets/dots-vertical-rounded.svg" alt="Error">
-                <div class="action-menu">
-                    <div class="edit-btn">
-                        <img src="assets/pencil.svg" alt="Error">
-                        <p>Edit</p>
-                    </div>
-                    <div class="delete-btn">
-                        <img src='assets/trash-light-red.svg' alt='Error'>
-                        <p>Delete</p>
-                    </div>
-                </div>
-            `
-            document.querySelector('.account-list').appendChild(row);
-
-            row.addEventListener('click', () => {
-                resetClick();
-
-                if (previousId === row.dataset.id) {
-                    closeCredential();
-                    previousId = null;
-                    return;
-                }
-                
-                previousId = row.dataset.id;
-                openCredential(row.dataset.id, row);
-            });
-
-            const menuBtn = row.querySelector('.action-menu-btn');
-            const actionMenu = row.querySelector('.action-menu');
-
-            // stops clicking the row when action menu is click
-            actionMenu.addEventListener('click', (e) => {
-                e.stopPropagation();
-            });
-
-            // functions the action menu button
-            menuBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-
-                let actionMenuOpened = actionMenu.classList.contains('show');
-                closeActionMenu();
-
-                if (actionMenuOpened) {
-                    actionMenu.classList.remove('show');
-                } else {
-                    console.log("\naccount id clicked: " + row.dataset.id);
-                    actionMenu.classList.add('show');
-                }
-            })
-
-            row.querySelector('.delete-btn').addEventListener('click', () => {
-                showDeleteModal();
-                closeActionMenu();
-
-                accountDetailsContainer.innerHTML = "";
-                deleteCredential(row);
-            });
-
-            clearInputData();
-            closeAddPanel();
-            hideEmptyState();
-        } else {
+    sendRequest(formdata).then(data => {
+        if (!data.success) {
             console.log("failed to add account");
-        };
+            return;
+        }
+
+        const row = createAccountRow(data);
+
+        const menuBtn = row.querySelector('.action-menu-btn');
+        const actionMenu = row.querySelector('.action-menu');
+
+        // stops clicking the row when action menu is click
+        actionMenu.addEventListener('click', e => e.stopPropagation());
+
+        // functions the action menu button
+        menuBtn.addEventListener('click', e => handleActionMenuClick(e, menuBtn));
+
+        row.querySelector('.delete-btn').addEventListener('click', () => handleDeleteBtn(row));
+
+        clearInputData();
+        closeAddPanel();
+        hideEmptyState();
     });
 });
+
+function createAccountRow(data) {
+    const row = document.createElement('div');
+        
+    row.dataset.id = data.id;
+    row.classList.add('account-row');
+    row.innerHTML = `
+        <p class="account-img">${data.initial.toUpperCase()}</p>
+        <div>
+            <p class='row-title'>${titleInput.value}</p>
+            <p class='row-username'>${usernameInput.value}</p>
+        </div>
+        <img class="action-menu-btn" src="assets/dots-vertical-rounded.svg" alt="Error">
+        <div class="action-menu">
+            <div class="edit-btn">
+                <img src="assets/pencil.svg" alt="Error">
+                <p>Edit</p>
+            </div>
+            <div class="delete-btn">
+                <img src='assets/trash-light-red.svg' alt='Error'>
+                <p>Delete</p>
+            </div>
+        </div>
+    `
+
+    document.querySelector('.account-list').appendChild(row);
+
+    row.addEventListener('click', () => {
+        handleRowClick(row);
+    });
+
+    return row;
+}
+
+function handleRowClick(row) {
+    resetClick();
+
+    if (previousId === row.dataset.id) {
+        closeCredential();
+        previousId = null;
+        return;
+    }
+    
+    previousId = row.dataset.id;
+    openCredential(row.dataset.id, row);
+}
+
+function handleActionMenuClick(e, menuBtn) {
+    e.stopPropagation();
+
+    const actionMenu = menuBtn.nextElementSibling;
+    const row = actionMenu.parentElement;
+    let actionMenuOpened = actionMenu.classList.contains('show');
+    
+    closeActionMenu();
+
+    if (actionMenuOpened) {
+        actionMenu.classList.remove('show');
+    } else {
+        console.log("\naccount id clicked: " + row.dataset.id);
+        actionMenu.classList.add('show');
+    }
+}
+
+function handleDeleteBtn(row) {
+    accountDetailsContainer.innerHTML = "";
+
+    showDeleteModal();
+    closeActionMenu();
+    loadCredentialForDelete(row);
+}
 
 /*============================================
 
@@ -172,16 +177,21 @@ saveButton.addEventListener('submit', (e) => {
 
 ============================================*/
 
+const emptyState = document.querySelector('.empty-state');
+
+// cancel add new account
 cancelButton.addEventListener('click', () => {
     clearInputData();
     closeAddPanel();
 });
 
+// clear error message
 function clearBlankInputState() {
     titleErrorMsg.classList.remove('show');
     titleInput.classList.remove('red-outline');
 }
 
+// clear input data
 function clearInputData() {
     titleInput.value = '';
     usernameInput.value = '';
@@ -191,8 +201,6 @@ function clearInputData() {
 }
 
 // handles empty state display
-const emptyState = document.querySelector('.empty-state');
-
 function hideEmptyState() {
     emptyState.classList.add('hide');
     accountList.classList.remove('hide');
@@ -287,51 +295,12 @@ const credentialsContainer = document.querySelector('#credentials-container');
 let credentialOpen = false;
 let previousId = null;
 
+// listens for click for each row stored in data base
 accountRow.forEach((row) => {
     row.addEventListener('click', () => {
-        resetClick();
-
-        if (previousId === row.dataset.id) {
-            closeCredential();
-            previousId = null;
-            return;
-        }
-
-        previousId = row.dataset.id;
-        openCredential(row.dataset.id, row);
+        handleRowClick(row);
     })
 })
-
-/*==========================================
-
-    close credential (pressing x button)
-
-==========================================*/
-
-const closeCredentialBtn = document.querySelector('.close-credential-btn');
-
-closeCredentialBtn.addEventListener('click', () => {
-    previousId = null;
-    resetClick();
-    closeCredential();
-});
-
-function resetClick() {
-    document.querySelectorAll('.account-row').forEach((row) => {
-        row.classList.remove('highlight');
-        const credentialContent = document.querySelector('.credential-content');
-        credentialContent.innerHTML = '';
-
-        const btn = row.querySelector('.action-menu-btn');
-        btn.classList.remove('show');
-    });
-}
-
-/*==============================
-
-    open credentials details
-
-==============================*/
 
 function openCredential(id, row) {
     const formdata = new FormData();
@@ -339,8 +308,8 @@ function openCredential(id, row) {
     formdata.append("action", "getCredential"); 
     formdata.append("id", id);
 
-    getCredential(formdata).then(data => {
-        if (!data) {
+    sendRequest(formdata).then(data => {
+        if (!data.success) {
             console.log("failed");
             return;
         }
@@ -355,21 +324,6 @@ function openCredential(id, row) {
     row.classList.add('highlight');
     const btn = row.querySelector('.action-menu-btn');
     btn.classList.add('show');
-}
-
-function getCredential(formdata) {
-    return fetch("action.php", {
-        method: "POST",
-        body: formdata
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) {
-            return data;
-        } else {
-            return false;
-        }
-    })
 }
 
 function renderCredential(data) {
@@ -436,8 +390,50 @@ function renderCredential(data) {
     }
 
     credentialContent.innerHTML = html;
-    showHidePassword();
+
+    if (data.password) showHidePassword();
 }
+
+/*============================
+
+    close credential panel
+
+============================*/
+
+const closeCredentialBtn = document.querySelector('.close-credential-btn');
+
+closeCredentialBtn.addEventListener('click', () => {
+    previousId = null;
+    resetClick();
+    closeCredential();
+});
+
+function closeCredential() {
+    credentialsContainer.classList.remove('flex');
+    accountList.classList.remove('open'); // don't mind why i did not add 'close' "just dont change anything"
+
+    credentialOpen = false;
+
+    const credentialContent = document.querySelector('.credential-content');
+    credentialContent.innerHTML = '';
+}
+
+function resetClick() {
+    document.querySelectorAll('.account-row').forEach((row) => {
+        row.classList.remove('highlight');
+        const credentialContent = document.querySelector('.credential-content');
+        credentialContent.innerHTML = '';
+
+        const btn = row.querySelector('.action-menu-btn');
+        btn.classList.remove('show');
+    });
+}
+
+/*===============================
+
+    show/hide password inside
+
+===============================*/
 
 function showHidePassword() {
     const showPasswordIcon = document.querySelector('.show-password-icon');
@@ -475,20 +471,6 @@ function showHidePassword() {
     });
 }
 
-function closeCredential() {
-    credentialsContainer.classList.remove('flex');
-    accountList.classList.remove('open'); // don't mind why i did not add 'close' "just dont change anything"
-
-    credentialOpen = false;
-
-    const credentialContent = document.querySelector('.credential-content');
-    credentialContent.innerHTML = '';
-}
-
-const closeAddPanelBtn = document.querySelector('.close-add-panel-btn');
-
-closeAddPanelBtn.addEventListener('click', closeAddPanel);
-
 /*===============================
 
     action menu functionality
@@ -504,32 +486,16 @@ function closeActionMenu() {
     });
 }
 
-// stops clicking the row when action menu is clicked
 const actionMenu = document.querySelectorAll('.action-menu');
 
+// stops clicking the row when action menu is clicked
 actionMenu.forEach((menu) => {
-    menu.addEventListener('click', (e) => {
-        e.stopPropagation();
-    });
+    menu.addEventListener('click', e => e.stopPropagation());
 });
 
 // action menu click
 document.querySelectorAll('.action-menu-btn').forEach((menuBtn) => {
-    menuBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const row = menuBtn.parentElement;
-
-        let actionMenuOpened = menuBtn.nextElementSibling.classList.contains('show');
-        closeActionMenu();
-
-        if (actionMenuOpened) {
-            menuBtn.nextElementSibling.classList.remove('show');
-        } else {
-            console.log("\naccount id clicked: " + row.dataset.id);
-            //menuBtn.classList.add('show');
-            menuBtn.nextElementSibling.classList.add('show');
-        }
-    });
+    menuBtn.addEventListener('click', e => handleActionMenuClick(e, menuBtn));
 });
 
 /*====================
@@ -542,31 +508,28 @@ const deleteBtn = document.querySelectorAll('.delete-btn');
 const deleteModal = document.querySelector('.delete-modal');
 const accountDetailsContainer = document.querySelector(".account-details-container");
 
+// press delete button
 deleteBtn.forEach((btn) => {
-    btn.addEventListener('click', () => {
-        showDeleteModal();
-        closeActionMenu();
-
-        const row = btn.parentElement.parentElement;
-        accountDetailsContainer.innerHTML = "";
-        deleteCredential(row);
-    });
+    const row = btn.parentElement.parentElement;
+    btn.addEventListener('click', () => handleDeleteBtn(row));
 });
 
+// show delete modal
 function showDeleteModal() {
     unfocus.classList.add('show');
     deleteModal.classList.add('show');
 }
 
-function deleteCredential(row) {
+// access account to delete data
+function loadCredentialForDelete(row) {
     const formdata = new FormData();
     deleteId = row.dataset.id;
 
     formdata.append("action", "getCredential"); 
     formdata.append("id", row.dataset.id);
 
-    getCredential(formdata).then(data => {
-        if (!data) {
+    sendRequest(formdata).then(data => {
+        if (!data.success) {
             console.log("failed");
             return;
         }
@@ -581,6 +544,7 @@ function deleteCredential(row) {
 
 let deleteId = null;
 
+// display account data in delete modal
 function displayAccountInfo(data) {
     accountDetailsContainer.innerHTML = `
         <p class="sub-heading">This will permanently remove <span>${data.title}</span> from your saved accounts.</p>
@@ -600,38 +564,59 @@ function displayAccountInfo(data) {
 const cancelDelete = document.querySelector('.confirm-delete .cancel');
 const continueDelete = document.querySelector('.confirm-delete .delete');
 
-cancelDelete.addEventListener('click', closeAddPanel);
+// cancel delete account
+cancelDelete.addEventListener('click', closeDeleteModal);
+
+// proceed deleting account
 continueDelete.addEventListener('click', () => {
     const formdata = new FormData();
 
     formdata.append("action", "deleteCredential");
     formdata.append("id", deleteId);
 
-    fetch("action.php", {
+    sendRequest(formdata).then(data => {
+        if (!data.success) {
+            console.log("delete failed");
+            return;
+        }
+
+        console.log("delete successful");
+
+        const row = document.querySelector(`.account-row[data-id="${deleteId}"]`);
+        if (row) row.remove();
+
+        if (previousId === deleteId) {
+            closeCredential();
+            previousId = null;
+        }
+
+        closeDeleteModal();
+
+        if (document.querySelectorAll('.account-row').length === 0) {
+            emptyState.classList.remove('hide');
+            accountList.classList.add('hide');
+        }
+    })
+});
+
+// close delete modal
+function closeDeleteModal() {
+    unfocus.classList.remove('show');
+    deleteModal.classList.remove('show');
+    deleteModal.classList.remove('visible');
+    deleteId = null;
+}
+
+/*===============
+
+    utilities
+
+===============*/
+
+function sendRequest(formdata) {
+    return fetch("action.php", {
         method: "POST",
         body: formdata
     })
     .then(res => res.json())
-    .then(data => {
-        if (data.success) {
-            console.log("delete successful");
-
-            const row = document.querySelector(`.account-row[data-id="${deleteId}"]`);
-            if (row) row.remove();
-
-            if (previousId === deleteId) {
-                closeCredential();
-                previousId = null;
-            }
-
-            closeAddPanel();
-
-            if (document.querySelectorAll('.account-row').length === 0) {
-                emptyState.classList.remove('hide');
-                accountList.classList.add('hide');
-            }
-        } else {
-            console.log("delete failed");
-        }
-    })
-});
+}
