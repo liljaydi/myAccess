@@ -36,24 +36,40 @@ function sendRequest(formdata) {
 const addButton = document.querySelectorAll('.add-button');
 const closeAddPanelBtn = document.querySelector('.close-add-panel-btn');
 const addPanel = document.getElementById('add-panel');
+const addPasswordIcon = document.querySelector('.add-password-icon');
 
 // open add panel
 addButton.forEach((button) => {
     button.addEventListener('click', showAddPanel);
 });
 
-// close add panel and delete modal
+// close add panel, delete modal, and logout modal
 unfocus.addEventListener('click', () => {
     closeAddPanel();
     closeDeleteModal();
     closeLogoutModal();
 });
 
+// close add panel
 closeAddPanelBtn.addEventListener('click', closeAddPanel);
+
+// password input visibility
+addPasswordIcon.addEventListener('click', () => {
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        addPasswordIcon.src = 'assets/eye-slash-gray.svg';
+    } else {
+        passwordInput.type = 'password';
+        addPasswordIcon.src = 'assets/eye-gray.svg';
+    }
+});
 
 function showAddPanel() {
     addPanel.classList.add('show');
     unfocus.classList.add('show');
+
+    passwordInput.type = 'password';
+    addPasswordIcon.src = 'assets/eye-gray.svg';
 }
 
 function closeAddPanel() {

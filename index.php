@@ -80,7 +80,10 @@
                     <p class="login-email-invalid">Account does not exist</p>
                     
                     <label>Password</label>
-                    <input class="login-password" name="password" type="password" placeholder="Your password">
+                    <div class="login-password-field">
+                        <input class="login-password" name="password" type="password" placeholder="Your password">
+                        <img class="auth-password-icon" src="assets/eye-gray.svg" alt="Error">
+                    </div>
                     <p class="login-password-empty">Please enter your password</p>
                     <p class="login-password-incorrect">Incorrect password</p>
 
@@ -103,11 +106,17 @@
                     <p class="signup-duplicate-account">Account already exists</p>
 
                     <label>Password</label>
-                    <input class="signup-password" name="password" type="password" placeholder="Your password">
+                    <div class="signup-password-field">
+                        <input class="signup-password" name="password" type="password" placeholder="Your password">
+                        <img class="auth-password-icon" src="assets/eye-gray.svg" alt="Error">
+                    </div>
                     <p class="signup-password-empty">Please enter your password</p>
 
                     <label>Confirm password</label>
-                    <input class="signup-confirm-password" name="confirm-password" type="password" placeholder="Confirm your password">
+                    <div class="signup-confirm-password-field">
+                        <input class="signup-confirm-password" name="confirm-password" type="password" placeholder="Confirm your password">
+                        <img class="auth-password-icon" src="assets/eye-gray.svg" alt="Error">
+                    </div>
                     <p class="signup-confirm-password-empty">Please confirm your password</p>
                     <p class="signup-confirm-password-mismatch">Password do not match</p>
 

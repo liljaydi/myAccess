@@ -198,8 +198,11 @@ $loginNameInitial = strtoupper(mb_substr($loginName, 0, 2));
             
                 <!-- password -->
                 <label>PASSWORD</label>
-                <input name="password" class="password" type="password" placeholder="Enter password">
-            
+                <div class="password-field">
+                    <input name="password" class="password" type="password" placeholder="Enter password">
+                    <img class="add-password-icon" src="assets/eye-gray.svg" alt="Error">
+                </div>
+
                 <!-- url -->
                 <label>URL</label>
                 <input name="url" class="url" type="text" placeholder="e.g. facebook.com">

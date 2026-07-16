@@ -19,6 +19,8 @@ signupButton.addEventListener('click', signupMode);
 
 function loginMode() {
     clearErrorMessage();
+    loginPassword.type = 'password';
+    loginPasswordIcon.src = 'assets/eye-gray.svg';
     
     authPanel.classList.add('login-mode');
     authPanel.classList.remove('signup-mode');
@@ -29,6 +31,10 @@ function loginMode() {
 
 function signupMode() {
     clearErrorMessage();
+    signupPassword.type = 'password';
+    signupConfirmPassword.type = 'password';
+    signupPasswordIcon.src = 'assets/eye-gray.svg';
+    signupConfirmPasswordIcon.src = 'assets/eye-gray.svg';
 
     authPanel.classList.add('signup-mode');
     authPanel.classList.remove('login-mode');
@@ -78,6 +84,19 @@ const loginPasswordIncorrect = document.querySelector('.login-password-incorrect
 
 const loginEmail = document.querySelector('.login-email');
 const loginPassword = document.querySelector('.login-password');
+
+const loginPasswordIcon = document.querySelector('.login-password-field .auth-password-icon');
+
+// password visibility
+loginPasswordIcon.addEventListener('click', () => {
+    if (loginPassword.type === 'password') {
+        loginPassword.type = 'text';
+        loginPasswordIcon.src = 'assets/eye-slash-gray.svg';
+    } else {
+        loginPassword.type = 'password';
+        loginPasswordIcon.src = 'assets/eye-gray.svg';
+    }
+});
 
 loginForm.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -138,6 +157,31 @@ const signupName = document.querySelector('.signup-name');
 const signupEmail = document.querySelector('.signup-email');
 const signupPassword = document.querySelector('.signup-password');
 const signupConfirmPassword = document.querySelector('.signup-confirm-password');
+
+const signupPasswordIcon = document.querySelector('.signup-password-field .auth-password-icon');
+const signupConfirmPasswordIcon = document.querySelector('.signup-confirm-password-field .auth-password-icon');
+
+// password visibility
+signupPasswordIcon.addEventListener('click', () => {
+    if (signupPassword.type === 'password') {
+        signupPassword.type = 'text';
+        signupPasswordIcon.src = 'assets/eye-slash-gray.svg';
+    } else {
+        signupPassword.type = 'password';
+        signupPasswordIcon.src = 'assets/eye-gray.svg';
+    }
+});
+
+// password visibility
+signupConfirmPasswordIcon.addEventListener('click', () => {
+    if (signupConfirmPassword.type === 'password') {
+        signupConfirmPassword.type = 'text';
+        signupConfirmPasswordIcon.src = 'assets/eye-slash-gray.svg';
+    } else {
+        signupConfirmPassword.type = 'password';
+        signupConfirmPasswordIcon.src = 'assets/eye-gray.svg';
+    }
+});
 
 signupForm.addEventListener('submit', (e) => {
     e.preventDefault();

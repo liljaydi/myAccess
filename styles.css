@@ -369,3 +369,24 @@ container right - authentication
 .signup-duplicate-account.show {
     display: block;
 }
+
+/*
+
+    password eye in add panel
+
+*/
+
+.login-password-field,
+.signup-password-field,
+.signup-confirm-password-field {
+    display: flex;
+    position: relative;
+}
+
+.auth-password-icon {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    width: 18px;
+    cursor: pointer;
+}
