@@ -7,6 +7,8 @@ Built from scratch as a learning project.
 
 https://myaccess.rf.gd
 
+Hosted on InfinityFree (free hosting).
+
 > ⚠️ Chrome may display a **"Dangerous Site"** warning when opening the link.
 > This is a false positive — the site is flagged because it contains a login form
 > and is hosted on a free domain, which Chrome's algorithm treats as suspicious.
